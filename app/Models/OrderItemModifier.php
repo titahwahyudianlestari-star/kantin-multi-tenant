@@ -7,30 +7,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderItemModifier extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'order_item_id',
-        'modifier_group_id',
         'modifier_option_id',
-        'group_snapshot',
-        'options_snapshot',
+        'quantity',
         'price_delta_snapshot',
     ];
 
-    protected $casts = [
-        'group_snapshot' => 'array',
-        'options_snapshot' => 'array',
-    ];
-
+    /** @return BelongsTo<OrderItem, $this> */
     public function orderItem(): BelongsTo
     {
         return $this->belongsTo(OrderItem::class);
     }
 
-    public function modifierGroup(): BelongsTo
-    {
-        return $this->belongsTo(ModifierGroup::class);
-    }
-
+    /** @return BelongsTo<ModifierOption, $this> */
     public function modifierOption(): BelongsTo
     {
         return $this->belongsTo(ModifierOption::class);

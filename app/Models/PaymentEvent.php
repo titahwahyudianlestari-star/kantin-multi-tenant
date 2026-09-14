@@ -11,24 +11,27 @@ class PaymentEvent extends Model
 
     protected $fillable = [
         'payment_id',
-        'attempt_id',
+        'payment_attempt_id',
+        'event_type',
         'provider_event_id',
-        'signature',
         'payload',
-        'processed_at',
+        'occurred_at',
     ];
 
     protected $casts = [
-        'processed_at' => 'datetime',
+        'payload' => 'array',
+        'occurred_at' => 'datetime',
     ];
 
+    /** @return BelongsTo<Payment, $this> */
     public function payment(): BelongsTo
     {
         return $this->belongsTo(Payment::class);
     }
 
-    public function attempt(): BelongsTo
+    /** @return BelongsTo<PaymentAttempt, $this> */
+    public function paymentAttempt(): BelongsTo
     {
-        return $this->belongsTo(PaymentAttempt::class, 'attempt_id');
+        return $this->belongsTo(PaymentAttempt::class);
     }
 }

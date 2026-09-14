@@ -27,11 +27,17 @@ class CustomerSession extends Model
         'expires_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<DiningTable, $this>
+     */
     public function diningTable(): BelongsTo
     {
         return $this->belongsTo(DiningTable::class);
     }
 
+    /**
+     * @return BelongsTo<TableQrToken, $this>
+     */
     public function tableQrToken(): BelongsTo
     {
         return $this->belongsTo(TableQrToken::class);

@@ -24,21 +24,25 @@ class Withdrawal extends Model
         'transfer_snapshot' => 'array',
     ];
 
+    /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /** @return BelongsTo<TenantBankAccount, $this> */
     public function bankAccount(): BelongsTo
     {
         return $this->belongsTo(TenantBankAccount::class, 'bank_account_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function requester(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requester_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewer_id');

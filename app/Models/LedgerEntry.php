@@ -24,21 +24,33 @@ class LedgerEntry extends Model
         'occurred_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /**
+     * @return BelongsTo<Order, $this>
+     */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
+    /**
+     * @return BelongsTo<Payment, $this>
+     */
     public function payment(): BelongsTo
     {
         return $this->belongsTo(Payment::class);
     }
 
+    /**
+     * @return BelongsTo<Withdrawal, $this>
+     */
     public function withdrawal(): BelongsTo
     {
         return $this->belongsTo(Withdrawal::class);

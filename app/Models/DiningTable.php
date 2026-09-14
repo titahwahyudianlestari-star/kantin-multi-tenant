@@ -18,16 +18,25 @@ class DiningTable extends Model
         'status',
     ];
 
+    /**
+     * @return BelongsTo<Canteen, $this>
+     */
     public function canteen(): BelongsTo
     {
         return $this->belongsTo(Canteen::class);
     }
 
+    /**
+     * @return HasMany<TableQrToken, $this>
+     */
     public function qrTokens(): HasMany
     {
         return $this->hasMany(TableQrToken::class);
     }
 
+    /**
+     * @return HasMany<CustomerSession, $this>
+     */
     public function customerSessions(): HasMany
     {
         return $this->hasMany(CustomerSession::class);

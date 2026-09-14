@@ -7,22 +7,33 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OutboxEvent extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
-        'tenant_id',
-        'event_key',
-        'aggregate_type',
-        'aggregate_id',
+        'order_id',
+        'tenant_order_id',
+        'event_type',
         'payload',
-        'published_at',
+        'status',
+        'available_at',
+        'processed_at',
     ];
 
     protected $casts = [
         'payload' => 'array',
-        'published_at' => 'datetime',
+        'available_at' => 'datetime',
+        'processed_at' => 'datetime',
     ];
 
-    public function tenant(): BelongsTo
+    /** @return BelongsTo<Order, $this> */
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(Tenant::class);
+        return $this->belongsTo(Order::class);
+    }
+
+    /** @return BelongsTo<TenantOrder, $this> */
+    public function tenantOrder(): BelongsTo
+    {
+        return $this->belongsTo(TenantOrder::class);
     }
 }

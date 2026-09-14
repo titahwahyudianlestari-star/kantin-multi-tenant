@@ -15,11 +15,13 @@ class UserCanteenRole extends Model
         'role',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Canteen, $this> */
     public function canteen(): BelongsTo
     {
         return $this->belongsTo(Canteen::class);

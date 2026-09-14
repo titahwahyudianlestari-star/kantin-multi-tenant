@@ -22,11 +22,13 @@ class ModifierOption extends Model
         'is_available' => 'boolean',
     ];
 
+    /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /** @return BelongsTo<ModifierGroup, $this> */
     public function group(): BelongsTo
     {
         return $this->belongsTo(ModifierGroup::class, 'group_id');

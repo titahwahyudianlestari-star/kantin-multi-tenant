@@ -23,11 +23,13 @@ class TenantBankAccount extends Model
         'is_primary' => 'boolean',
     ];
 
+    /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');

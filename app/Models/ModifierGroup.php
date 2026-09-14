@@ -21,16 +21,19 @@ class ModifierGroup extends Model
         'is_active' => 'boolean',
     ];
 
+    /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /** @return HasMany<ModifierOption, $this> */
     public function options(): HasMany
     {
         return $this->hasMany(ModifierOption::class, 'group_id');
     }
 
+    /** @return HasMany<MenuModifierGroup, $this> */
     public function menuModifierGroups(): HasMany
     {
         return $this->hasMany(MenuModifierGroup::class);

@@ -21,11 +21,17 @@ class MenuCategory extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    /**
+     * @return HasMany<Menu, $this>
+     */
     public function menus(): HasMany
     {
         return $this->hasMany(Menu::class, 'category_id');

@@ -17,11 +17,13 @@ class MenuStockMovement extends Model
         'quantity_delta',
     ];
 
+    /** @return BelongsTo<Menu, $this> */
     public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
     }
 
+    /** @return BelongsTo<OrderItem, $this> */
     public function orderItem(): BelongsTo
     {
         return $this->belongsTo(OrderItem::class);

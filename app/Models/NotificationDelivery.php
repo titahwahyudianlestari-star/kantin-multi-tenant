@@ -24,16 +24,19 @@ class NotificationDelivery extends Model
         'payload' => 'array',
     ];
 
+    /** @return BelongsTo<Order, $this> */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
+    /** @return BelongsTo<CustomerSession, $this> */
     public function customerSession(): BelongsTo
     {
         return $this->belongsTo(CustomerSession::class);
     }
 
+    /** @return BelongsTo<TenantOrder, $this> */
     public function tenantOrder(): BelongsTo
     {
         return $this->belongsTo(TenantOrder::class);

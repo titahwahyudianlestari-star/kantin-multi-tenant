@@ -15,21 +15,33 @@ class Canteen extends Model
         'status',
     ];
 
+    /**
+     * @return HasMany<Tenant, $this>
+     */
     public function tenants(): HasMany
     {
         return $this->hasMany(Tenant::class);
     }
 
+    /**
+     * @return HasMany<DiningTable, $this>
+     */
     public function diningTables(): HasMany
     {
         return $this->hasMany(DiningTable::class);
     }
 
+    /**
+     * @return HasMany<UserCanteenRole, $this>
+     */
     public function userCanteenRoles(): HasMany
     {
         return $this->hasMany(UserCanteenRole::class);
     }
 
+    /**
+     * @return HasMany<Order, $this>
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
