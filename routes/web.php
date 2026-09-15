@@ -7,7 +7,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     Route::prefix('tenant/{tenant:slug}')
         ->scopeBindings()
-        ->middleware('role:tenant')
+        ->middleware(['tenant', 'role:tenant'])
         ->name('tenant.')
         ->group(base_path('routes/tenant.php'));
 });

@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Modules\Tenant\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TenantBankAccount extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'tenant_id',
         'verified_by',
         'bank_name',
         'account_number_cipher',
