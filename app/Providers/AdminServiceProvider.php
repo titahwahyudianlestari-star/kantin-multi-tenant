@@ -13,6 +13,9 @@ class AdminServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        $this->loadViewsFrom(
+            base_path('app/Modules/Admin/resources/views'),
+            'admin'
+        );
     }
 }

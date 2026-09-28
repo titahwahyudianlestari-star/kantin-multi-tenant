@@ -21,6 +21,10 @@ Route::prefix('kantin/{canteen:slug}')
 Route::prefix('admin')
     ->middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
-    ->group(base_path('routes/admin.php'));
+    ->group(function (): void {
+        Route::view('/dashboard', 'dashboard')->name('dashboard');
+
+        require base_path('app/Modules/Admin/routes/admin.php');
+    });
 
 require __DIR__.'/settings.php';

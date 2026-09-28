@@ -11,8 +11,12 @@ class MenuModifierGroup extends Model
 
     protected $table = 'menu_modifier_groups';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'menu_id',
         'modifier_group_id',
+        'tenant_id',
+        'sort_order',
     ];
 }

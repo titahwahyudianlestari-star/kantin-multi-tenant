@@ -14,6 +14,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Models\UserCanteenRole;
 use App\Models\UserTenantRole;
+use App\Modules\Tenant\TenantContext;
 use Illuminate\Database\Seeder;
 
 class DemoCanteenSeeder extends Seeder
@@ -84,6 +85,9 @@ class DemoCanteenSeeder extends Seeder
             ]
         );
 
+        $tenantContext = app(TenantContext::class);
+        $tenantContext->set($tenant1);
+
         $category = MenuCategory::firstOrCreate(
             [
                 'tenant_id' => $tenant1->id,
@@ -135,13 +139,16 @@ class DemoCanteenSeeder extends Seeder
             ]
         );
 
-        MenuModifierGroup::firstOrCreate([
-            'menu_id' => $menu->id,
-            'modifier_group_id' => $modifierGroup->id,
-        ], [
-            'tenant_id' => $tenant1->id,
-            'sort_order' => 1,
-        ]);
+        MenuModifierGroup::firstOrCreate(
+            [
+                'menu_id' => $menu->id,
+                'modifier_group_id' => $modifierGroup->id,
+            ],
+            [
+                'tenant_id' => $tenant1->id,
+                'sort_order' => 1,
+            ]
+        );
 
         CommissionScheme::firstOrCreate(
             [
@@ -153,5 +160,7 @@ class DemoCanteenSeeder extends Seeder
                 'valid_to' => null,
             ]
         );
+
+        $tenantContext->clear();
     }
 }
