@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Admin\Http\Controllers\AdminCommissionController;
+use App\Modules\Admin\Http\Controllers\AdminDiningTableController;
 use App\Modules\Admin\Http\Controllers\AdminTenantBankAccountController;
 use App\Modules\Admin\Http\Controllers\AdminTenantController;
 use App\Modules\Admin\Http\Controllers\AdminTenantRoleController;
@@ -123,3 +124,29 @@ Route::post('/tenants/{tenant}/bank-accounts/{bankAccount}/reject', [
     AdminTenantBankAccountController::class,
     'reject',
 ])->name('tenants.bank-accounts.reject');
+
+/*
+|--------------------------------------------------------------------------
+| Dining Tables & QR
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/tables', [
+    AdminDiningTableController::class,
+    'index',
+])->name('tables.index');
+
+Route::post('/tables', [
+    AdminDiningTableController::class,
+    'store',
+])->name('tables.store');
+
+Route::post('/tables/{table}/rotate', [
+    AdminDiningTableController::class,
+    'rotate',
+])->name('tables.rotate');
+
+Route::get('/tables/{table}/qr', [
+    AdminDiningTableController::class,
+    'qr',
+])->name('tables.qr');

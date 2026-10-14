@@ -2,38 +2,46 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TableQrToken extends Model
 {
-    public $incrementing = false;
-
-    protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
-        'token',
-        'canteen_id',
-        'dining_table_id',
-        'token_hash',
-        'expires_at',
-        'revoked_at',
+        'status',
     ];
 
-    protected $casts = [
-        'expires_at' => 'datetime',
-        'revoked_at' => 'datetime',
-    ];
-
-    /** @return BelongsTo<Canteen, $this> */
-    public function canteen(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(Canteen::class);
+        return [
+            'issued_at' => 'datetime',
+            'expires_at' => 'datetime',
+            'revoked_at' => 'datetime',
+        ];
     }
 
-    /** @return BelongsTo<DiningTable, $this> */
+    /**
+     * @return BelongsTo<DiningTable, $this>
+     */
     public function diningTable(): BelongsTo
     {
         return $this->belongsTo(DiningTable::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active'
+            && $this->revoked_at === null
+            && ($this->expires_at === null || $this->expires_at->isFuture());
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query
+            ->where('status', 'active')
+            ->whereNull('revoked_at');
     }
 }

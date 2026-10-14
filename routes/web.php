@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Ordering\Http\Controllers\ResolveTableQrController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
@@ -13,6 +14,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 });
 
 Route::view('/', 'welcome')->name('home');
+
+Route::get('/q/{token}', ResolveTableQrController::class)
+    ->middleware('throttle:qr-scan')
+    ->name('customer.scan');
 
 Route::prefix('kantin/{canteen:slug}')
     ->name('customer.')
