@@ -7,7 +7,13 @@
 </head>
 <body>
 
-    <h1>Meja</h1>
+    <h1>Meja & QR</h1>
+
+    <p>
+        Total meja: {{ $tables->count() }}
+        |
+        Aktif: {{ $tables->where('status', 'active')->count() }}
+    </p>
 
     @if (session('status'))
         <p>{{ session('status') }}</p>
@@ -80,6 +86,7 @@
                 <th>Kode</th>
                 <th>Label</th>
                 <th>Zona</th>
+                <th>Status Meja</th>
                 <th>Status QR</th>
                 <th>Aksi</th>
             </tr>
@@ -89,36 +96,76 @@
             @forelse ($tables as $table)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
+
                     <td>{{ $table->code }}</td>
+
                     <td>{{ $table->label }}</td>
+
                     <td>{{ $table->zone ?? '-' }}</td>
 
                     <td>
-                        {{ $table->activeToken ? 'Aktif' : 'Belum ada' }}
+                        {{ $table->status === 'active' ? 'Aktif' : 'Nonaktif' }}
                     </td>
 
                     <td>
+                        {{ $table->activeToken ? 'QR Aktif' : 'Belum ada QR' }}
+                    </td>
+
+                    <td>
+                        @if ($table->status === 'active')
+                            <form
+                                method="POST"
+                                action="{{ route('admin.tables.rotate', $table) }}"
+                                style="display:inline-block;"
+                            >
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    @if ($table->activeToken)
+                                        onclick="return confirm('Rotate QR {{ $table->label }}? QR lama langsung tidak berlaku.')"
+                                    @endif
+                                >
+                                    {{ $table->activeToken ? 'Rotate QR' : 'Terbitkan QR' }}
+                                </button>
+                            </form>
+                        @endif
+
                         <form
                             method="POST"
-                            action="{{ route('admin.tables.rotate', $table) }}"
+                            action="{{ route('admin.tables.status', $table) }}"
+                            style="display:inline-block;"
                         >
                             @csrf
 
+                            <input
+                                type="hidden"
+                                name="status"
+                                value="{{ $table->status === 'active' ? 'inactive' : 'active' }}"
+                            >
+
                             <button type="submit">
-                                {{ $table->activeToken ? 'Rotate QR' : 'Terbitkan QR' }}
+                                {{ $table->status === 'active' ? 'Nonaktifkan' : 'Aktifkan kembali' }}
                             </button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         Belum ada meja.
                     </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
+
+    <br>
+
+    <p>
+        Token QR menggunakan opaque token.
+        Rotate QR akan langsung membuat QR lama tidak berlaku.
+    </p>
 
 </body>
 </html>

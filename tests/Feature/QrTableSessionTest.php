@@ -24,7 +24,7 @@ class QrTableSessionTest extends TestCase
     ): Canteen {
         $code ??= 'KNT'.Str::upper(Str::random(6));
 
-        $canteen = new Canteen();
+        $canteen = new Canteen;
 
         $canteen->forceFill([
             'code' => $code,
@@ -44,7 +44,7 @@ class QrTableSessionTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        $role = new UserCanteenRole();
+        $role = new UserCanteenRole;
 
         $role->forceFill([
             'user_id' => $user->id,
@@ -63,7 +63,7 @@ class QrTableSessionTest extends TestCase
         $canteen ??= $this->canteen();
         $code ??= 'T'.Str::upper(Str::random(6));
 
-        $table = new DiningTable();
+        $table = new DiningTable;
 
         $table->forceFill([
             'canteen_id' => $canteen->id,
@@ -87,7 +87,6 @@ class QrTableSessionTest extends TestCase
             'T1'
         );
 
-        // Kode yang sama pada kantin berbeda diperbolehkan.
         $tableB = $this->table(
             $canteenB,
             'active',
@@ -109,8 +108,6 @@ class QrTableSessionTest extends TestCase
             $tableB->canteen_id
         );
 
-        // Kode yang sama pada kantin yang sama harus ditolak
-        // oleh unique composite index database.
         try {
             $this->table(
                 $canteenA,
@@ -130,8 +127,14 @@ class QrTableSessionTest extends TestCase
         $this->assertSame(
             1,
             DiningTable::query()
-                ->where('canteen_id', $canteenA->id)
-                ->where('code', 'T1')
+                ->where(
+                    'canteen_id',
+                    $canteenA->id
+                )
+                ->where(
+                    'code',
+                    'T1'
+                )
                 ->count()
         );
     }
@@ -147,47 +150,68 @@ class QrTableSessionTest extends TestCase
 
         $this->actingAs($outsider);
 
-        $this->get(route('admin.tables.index'))
-            ->assertForbidden();
+        $this->get(
+            route('admin.tables.index')
+        )->assertForbidden();
     }
 
     public function test_rotate_revokes_old_token_and_keeps_single_active(): void
     {
         $table = $this->table();
 
-        $qr = app(QrTokenService::class);
+        $qr = app(
+            QrTokenService::class
+        );
 
         $plain1 = $qr->issue($table);
 
-        $this->get(route('customer.scan', [
-            'token' => $plain1,
-        ]))->assertRedirect();
+        $this->get(
+            route('customer.scan', [
+                'token' => $plain1,
+            ])
+        )->assertRedirect();
 
         $plain2 = $qr->rotate($table);
 
-        // Token lama langsung tidak berlaku.
-        $this->get(route('customer.scan', [
-            'token' => $plain1,
-        ]))->assertNotFound();
+        // QR lama harus langsung tidak berlaku.
+        $this->get(
+            route('customer.scan', [
+                'token' => $plain1,
+            ])
+        )->assertNotFound();
 
-        // Token baru tetap valid.
-        $this->get(route('customer.scan', [
-            'token' => $plain2,
-        ]))->assertRedirect();
+        // QR baru tetap valid.
+        $this->get(
+            route('customer.scan', [
+                'token' => $plain2,
+            ])
+        )->assertRedirect();
 
         $this->assertSame(
             1,
             TableQrToken::query()
-                ->where('dining_table_id', $table->id)
-                ->where('status', 'active')
+                ->where(
+                    'dining_table_id',
+                    $table->id
+                )
+                ->where(
+                    'status',
+                    'active'
+                )
                 ->count()
         );
 
         $this->assertSame(
             1,
             TableQrToken::query()
-                ->where('dining_table_id', $table->id)
-                ->where('status', 'revoked')
+                ->where(
+                    'dining_table_id',
+                    $table->id
+                )
+                ->where(
+                    'status',
+                    'revoked'
+                )
                 ->count()
         );
     }
@@ -195,10 +219,14 @@ class QrTableSessionTest extends TestCase
     public function test_valid_scan_creates_bound_session_with_secure_cookie(): void
     {
         $canteen = $this->canteen();
-        $table = $this->table($canteen);
 
-        $plain = app(QrTokenService::class)
-            ->issue($table);
+        $table = $this->table(
+            $canteen
+        );
+
+        $plain = app(
+            QrTokenService::class
+        )->issue($table);
 
         $response = $this->get(
             route('customer.scan', [
@@ -206,8 +234,13 @@ class QrTableSessionTest extends TestCase
             ])
         );
 
+        /*
+         * Tahap 8:
+         * scan valid sekarang diarahkan ke
+         * halaman sambutan meja.
+         */
         $response->assertRedirect(
-            route('customer.home', [
+            route('customer.welcome', [
                 'canteen' => $canteen->slug,
             ])
         );
@@ -231,7 +264,9 @@ class QrTableSessionTest extends TestCase
 
         $this->assertSame(
             32,
-            strlen($session->session_token_hash)
+            strlen(
+                $session->session_token_hash
+            )
         );
 
         $response->assertCookie(
@@ -243,54 +278,74 @@ class QrTableSessionTest extends TestCase
             false
         );
 
-        $this->assertNotNull($cookie);
+        $this->assertNotNull(
+            $cookie
+        );
+
         $this->assertTrue(
             $cookie->isHttpOnly()
         );
 
         $this->assertSame(
             'lax',
-            strtolower($cookie->getSameSite())
+            strtolower(
+                $cookie->getSameSite()
+            )
         );
     }
 
     public function test_invalid_tokens_are_generic_404(): void
     {
         // Token acak.
-        $this->get(route('customer.scan', [
-            'token' => 'tidak-ada-token',
-        ]))->assertNotFound();
+        $this->get(
+            route('customer.scan', [
+                'token' => 'tidak-ada-token',
+            ])
+        )
+            ->assertNotFound()
+            ->assertSee(
+                'hubungi petugas kantin'
+            );
 
         // ID numerik tidak boleh dipakai untuk enumeration.
-        $this->get(route('customer.scan', [
-            'token' => '1',
-        ]))->assertNotFound();
+        $this->get(
+            route('customer.scan', [
+                'token' => '1',
+            ])
+        )->assertNotFound();
 
         // Token revoked.
         $table = $this->table();
 
-        $plain = app(QrTokenService::class)
-            ->issue($table);
+        $plain = app(
+            QrTokenService::class
+        )->issue($table);
 
-        app(QrTokenService::class)
-            ->rotate($table);
+        app(
+            QrTokenService::class
+        )->rotate($table);
 
-        $this->get(route('customer.scan', [
-            'token' => $plain,
-        ]))->assertNotFound();
+        $this->get(
+            route('customer.scan', [
+                'token' => $plain,
+            ])
+        )->assertNotFound();
 
         // Token expired.
         $expiredTable = $this->table();
 
-        $expiredPlain = app(QrTokenService::class)
-            ->issue(
-                $expiredTable,
-                now()->subMinute()
-            );
+        $expiredPlain = app(
+            QrTokenService::class
+        )->issue(
+            $expiredTable,
+            now()->subMinute()
+        );
 
-        $this->get(route('customer.scan', [
-            'token' => $expiredPlain,
-        ]))->assertNotFound();
+        $this->get(
+            route('customer.scan', [
+                'token' => $expiredPlain,
+            ])
+        )->assertNotFound();
 
         // Kantin inactive.
         $inactiveCanteen = $this->canteen(
@@ -301,12 +356,15 @@ class QrTableSessionTest extends TestCase
             $inactiveCanteen
         );
 
-        $plain2 = app(QrTokenService::class)
-            ->issue($table2);
+        $plain2 = app(
+            QrTokenService::class
+        )->issue($table2);
 
-        $this->get(route('customer.scan', [
-            'token' => $plain2,
-        ]))->assertNotFound();
+        $this->get(
+            route('customer.scan', [
+                'token' => $plain2,
+            ])
+        )->assertNotFound();
 
         // Meja inactive.
         $table3 = $this->table(
@@ -314,11 +372,14 @@ class QrTableSessionTest extends TestCase
             'inactive'
         );
 
-        $plain3 = app(QrTokenService::class)
-            ->issue($table3);
+        $plain3 = app(
+            QrTokenService::class
+        )->issue($table3);
 
-        $this->get(route('customer.scan', [
-            'token' => $plain3,
-        ]))->assertNotFound();
+        $this->get(
+            route('customer.scan', [
+                'token' => $plain3,
+            ])
+        )->assertNotFound();
     }
 }

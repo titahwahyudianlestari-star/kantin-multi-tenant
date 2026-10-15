@@ -12,8 +12,7 @@ final class QrTokenService
 {
     public function __construct(
         private AuditLogger $audit
-    ) {
-    }
+    ) {}
 
     public function issue(
         DiningTable $table,
@@ -35,7 +34,7 @@ final class QrTokenService
 
             $token = OpaqueToken::issue(32);
 
-            $qr = new TableQrToken();
+            $qr = new TableQrToken;
 
             $qr->forceFill([
                 'dining_table_id' => $locked->id,

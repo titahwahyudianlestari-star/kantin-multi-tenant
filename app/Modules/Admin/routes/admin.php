@@ -150,3 +150,8 @@ Route::get('/tables/{table}/qr', [
     AdminDiningTableController::class,
     'qr',
 ])->name('tables.qr');
+
+Route::post('/tables/{table}/status', [
+    AdminDiningTableController::class,
+    'status',
+])->name('tables.status');

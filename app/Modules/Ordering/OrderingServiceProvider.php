@@ -16,6 +16,11 @@ final class OrderingServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadViewsFrom(
+            base_path('app/Modules/Ordering/resources/views'),
+            'ordering'
+        );
+
         RateLimiter::for(
             'qr-scan',
             fn (Request $request): Limit => Limit::perMinute(30)
